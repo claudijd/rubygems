@@ -91,11 +91,13 @@ class Gem::RemoteFetcher
     begin
       res = @dns.getresource "_rubygems._tcp.#{host}",
                              Resolv::DNS::Resource::IN::SRV
+      if res.target.to_s.end_with?(host)
+        return URI.parse "#{uri.scheme}://#{res.target}#{uri.path}"
+      end
     rescue Resolv::ResolvError
-      uri
-    else
-      URI.parse "#{uri.scheme}://#{res.target}#{uri.path}"
     end
+
+    uri
   end
 
   ##
