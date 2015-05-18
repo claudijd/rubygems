@@ -196,6 +196,21 @@ gems:
     dns.verify
   end
 
+  def test_api_endpoint_ignores_trans_domain_values_bypass_attempt
+    uri = URI.parse "http://example.com/foo"
+    target = MiniTest::Mock.new
+    target.expect :target, "blahexample.com"
+
+    dns = MiniTest::Mock.new
+    dns.expect :getresource, target, [String, Object]
+
+    fetch = Gem::RemoteFetcher.new nil, dns
+    assert_equal URI.parse("http://example.com/foo"), fetch.api_endpoint(uri)
+
+    target.verify
+    dns.verify
+  end
+
   def test_cache_update_path
     uri = URI 'http://example/file'
     path = File.join @tempdir, 'file'
